@@ -2,13 +2,13 @@ openapi: 3.0.3
 info:
   title: SALI DRAFT API Standards v0.2
   description: |-
-    SALI is a not-for-profit organization comprised of legal industry professionals from legal operations, law firms and solution providers with the goal of developing open, practical industry standards for efficient and innovative legal services. _You can find more information at: [https://www.sali.org](https://www.sali.org)._
+    SALI is a nonprofit organization comprised of legal industry professionals from corporate law departments, law firms, and solution providers with the goal of developing open, practical industry standards for efficient and innovative legal services. More information at: [https://www.sali.org](https://www.sali.org)._
 
     This document contains a set of API Standrads compliant with SALI and the [Legal Matter Specification Standard](https://www.sali.org/Using-the-LMSS).
 
   license:
     name: SALI Open Standard Policy
-    url: https://www.sali.org/Frequently-Asked-Questions
+    url: https://github.com/sali-legal/api/blob/main/LICENSE
   version: 1.0.0
 servers:
   - description: SwaggerHub API Auto Mocking
@@ -17,9 +17,9 @@ servers:
     url: https://app.swaggerhub.com/apis/SALI-LMSS-V1/LMSS-API/1.0.0
 tags:
   - name: supported
-    description: Shows supported features of the API
+    description: Shows the API's supported features
   - name: matter
-    description: Contains information about the type of legal work
+    description: Contains information about the legal work
   - name: document
     description: Contains information about legal documents
 
@@ -28,8 +28,8 @@ paths:
     get:
       tags:
         - supported
-      summary: Show all the SALI LMSS fields/tags supported by the implementer of the API
-      description: Show all the SALI LMSS fields/tags supported by the implementer of the API
+      summary: Show all the SALI LMSS fields/tags supported by the API implementer
+      description: Show all the SALI LMSS fields/tags supported by the API implementer
       responses:
         "200":
           description: Successful operation
@@ -61,12 +61,15 @@ paths:
         "404":
           description: Not found
 
+# Below, is `Tax` a filter to find (1) `Areas of law` like both `Tax and Revenue Law` and `Tax Law` or (2) is `Tax` a full-text query?
+# If (1), then is `eq` operator correct -- since `Tax` isn't really "equal" to either `Tax and Revenue Law` or `Tax Law`. If (2), then same question: full-text query wouldn't be "equal"?
+
   /matter/find:
     post:
       tags:
         - matter
-      summary: Find a list of matters based on standard LMSS fields
-      description: Find a list of matters based on standard LMSS fields
+      summary: Using standard LMSS fields, find a list of matters 
+      description: Using standard LMSS fields, find a list of matters 
       requestBody:
         description: The query to find matters information from LMSS tags
         content:
@@ -114,11 +117,11 @@ paths:
     post:
       tags:
         - document
-      summary: Find a list of documents based on standard LMSS fields
-      description: Find a list of documents based on standard LMSS fields
+      summary: Using standard LMSS tags, find a list of documents.
+      description: Using standard LMSS tags, find a list of documents.
       operationId: findDocs
       requestBody:
-        description: The query to find documents information from LMSS tags
+        description: The query to use LMSS tags to find document information
         content:
           application/json:
             schema:
@@ -161,6 +164,17 @@ paths:
         "405":
           description: Invalid input
 
+# The below appear to be from LMSS 1.0, but I'm not sure whether they continue to be valid with LMSS 2.0
+# Is the language "Wage and hour class action against XYZ Corp" a natural language query? Or a value (from a database)?
+
+# Same question: "Jane Smith and co-workers" = natural language query (e.g., LLM query)
+# Regardless, how to handle query language? Filter?
+
+# Also, is everything below conjunct (AND) or disjunct (OR)?
+# Regardless, will we handle those AND/OR/NOT operators?
+
+# Also, how will we run a query for a specific string (e.g., `4:22-cv-06823` = `Litigation Docket Number` http://lmss.sali.org/R76LI21wQ90B6IH1x5jfFy0)?
+# In this documentation, can we give multiple examples?
 
 components:
   schemas:
