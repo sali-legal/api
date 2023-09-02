@@ -1,0 +1,236 @@
+openapi: 3.0.3
+info:
+  title: SALI DRAFT API Standards v0.2
+  description: |-
+    SALI is a not-for-profit organization comprised of legal industry professionals from legal operations, law firms and solution providers with the goal of developing open, practical industry standards for efficient and innovative legal services. _You can find more information at: [https://www.sali.org](https://www.sali.org)._
+
+    This document contains a set of API Standrads compliant with SALI and the [Legal Matter Specification Standard](https://www.sali.org/Using-the-LMSS).
+
+  license:
+    name: SALI Open Standard Policy
+    url: https://www.sali.org/Frequently-Asked-Questions
+  version: 1.0.0
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/SALI-LMSS-V1/LMSS-API/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://app.swaggerhub.com/apis/SALI-LMSS-V1/LMSS-API/1.0.0
+tags:
+  - name: supported
+    description: Shows supported features of the API
+  - name: matter
+    description: Contains information about the type of legal work
+  - name: document
+    description: Contains information about legal documents
+
+paths:
+  /supported/fields:
+    get:
+      tags:
+        - supported
+      summary: Show all the SALI LMSS fields/tags supported by the implementer of the API
+      description: Show all the SALI LMSS fields/tags supported by the implementer of the API
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  saliVersion:
+                    type: integer
+                    format: int64
+                    example: 1.0.0
+                  fields:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sali:IRI:
+                          type: string
+                          format: string
+                        rdfs:label:
+                          type: string
+                          format: string
+                      example:
+                        - sali:IRI: http://lmss.sali.org/R3391bdB1A2adE51071C7cf7
+                          rdfs:label: "New York State Courts"
+                        - sali:IRI: http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr
+                          rdfs:label: "Area of Law"
+        "404":
+          description: Not found
+
+  /matter/find:
+    post:
+      tags:
+        - matter
+      summary: Find a list of matters based on standard LMSS fields
+      description: Find a list of matters based on standard LMSS fields
+      requestBody:
+        description: The query to find matters information from LMSS tags
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  sali:IRI:
+                    type: string
+                  rdfs:label:
+                    type: string
+                  filter:
+                    type: string
+                  operation:
+                    type: string
+                example:
+                  - sali:IRI: "http://lmss.sali.org/R3391bdB1A2adE51071C7cf7"
+                    rdfs:label: "New York State Courts"
+                    filter:
+                    operation:
+                  - sali:IRI: "http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr"
+                    rdfs:label: "Area of Law"
+                    filter: "Tax"
+                    operation: "eq"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 57
+                  matters:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Matter"
+        "405":
+          description: Invalid input
+  /document/find:
+    post:
+      tags:
+        - document
+      summary: Find a list of documents based on standard LMSS fields
+      description: Find a list of documents based on standard LMSS fields
+      operationId: findDocs
+      requestBody:
+        description: The query to find documents information from LMSS tags
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  sali:IRI:
+                    type: string
+                  rdfs:label:
+                    type: string
+                  filter:
+                    type: string
+                  operation:
+                    type: string
+                example:
+                  - sali:IRI: "http://lmss.sali.org/R3391bdB1A2adE51071C7cf7"
+                    rdfs:label: "New York State Courts"
+                    filter:
+                    operation:
+                  - sali:IRI: "http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr"
+                    rdfs:label: "Area of Law"
+                    filter: "Tax"
+                    operation: "eq"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 57
+                  matters:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Document"
+        "405":
+          description: Invalid input
+
+
+components:
+  schemas:
+    supportedField:
+      type: object
+      properties:
+        saliVersion:
+          type: integer
+          format: int64
+          example: 1.0.0
+        fields:
+          type: array
+          items:
+            type: object
+            properties:
+              sali:IRI:
+                type: string
+                format: string
+              rdfs:label:
+                type: string
+                format: string
+            example:
+              - sali:IRI: http://lmss.sali.org/R3391bdB1A2adE51071C7cf7
+                rdfs:label: "New York State Courts"
+              - sali:IRI: http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr
+                rdfs:label: "Area of Law"
+    Matter:
+      type: object
+      properties:
+        lmssId:
+          type: string
+          format: string
+          example: A-B-C-D
+        title:
+          type: string
+          example: "Wage and hour class action against XYZ Corp."
+        locale:
+          type: string
+          example: "NAM-US-US+NY"
+        process:
+          $ref: "#/components/schemas/Process"
+    Process:
+      type: object
+      properties:
+        processType:
+          type: string
+          example: "D-CCI"
+        areaOfLaw:
+          type: string
+          example: "LEMP-WGHR"
+        actor:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Jane Smith and co-workers
+              role:
+                type: string
+                example: PLTF
+              legalEntity:
+                type: string
+    Document:
+      type: object
+      properties:
+        lmssId:
+          type: string
+          format: string
+          example: A-B-C-D
+        title:
+          type: string
+          example: "Wage and hour class action against XYZ Corp."
