@@ -61,9 +61,6 @@ paths:
         "404":
           description: Not found
 
-# Below, is `Tax` a filter to find (1) `Areas of law` like both `Tax and Revenue Law` and `Tax Law` or (2) is `Tax` a full-text query?
-# If (1), then is `eq` operator correct -- since `Tax` isn't really "equal" to either `Tax and Revenue Law` or `Tax Law`. If (2), then same question: full-text query wouldn't be "equal"?
-
   /matter/find:
     post:
       tags:
@@ -95,7 +92,7 @@ paths:
                   - sali:IRI: "http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr"
                     rdfs:label: "Area of Law"
                     filter: "Tax"
-                    operation: "eq"
+                    operation: "CONTAINS"
       responses:
         "200":
           description: successful operation
@@ -164,13 +161,16 @@ paths:
         "405":
           description: Invalid input
 
-# The below appear to be from LMSS 1.0, but I'm not sure whether they continue to be valid with LMSS 2.0
-# Is the language "Wage and hour class action against XYZ Corp" a natural language query? Or a value (from a database)?
+# QUESTION: The below appear to be from LMSS 1.0, but I'm not sure whether they continue to be valid with LMSS 2.0
+# ANSWER: Damien will add
+# QUESTION: Is the language "Wage and hour class action against XYZ Corp" a natural language query? Or a value (from a database)?
+# ANSWER: This is an organization-defined value/field. The "Wage and Hour..." language is a `Matter Narrative Description`
 
 # Same question: "Jane Smith and co-workers" = natural language query (e.g., LLM query)
-# Regardless, how to handle query language? Filter?
+# ANSWER: Same as above
 
 # Also, is everything below conjunct (AND) or disjunct (OR)?
+# ANSWER: Default = And
 # Regardless, will we handle those AND/OR/NOT operators?
 
 # Also, how will we run a query for a specific string (e.g., `4:22-cv-06823` = `Litigation Docket Number` http://lmss.sali.org/R76LI21wQ90B6IH1x5jfFy0)?
@@ -210,7 +210,8 @@ components:
           example: A-B-C-D
         title:
           type: string
-          example: "Wage and hour class action against XYZ Corp."
+          example: "Wage and Hour Law." sali:IRI: http://lmss.sali.org/R88iESKPlMDuSSfwDVX9scA
+          
         locale:
           type: string
           example: "NAM-US-US+NY"
@@ -221,7 +222,8 @@ components:
       properties:
         processType:
           type: string
-          example: "D-CCI"
+          Civil Dispute
+          example: "http://lmss.sali.org/R79LjWBKHCdmQKEW6zPY8Co"
         areaOfLaw:
           type: string
           example: "LEMP-WGHR"
@@ -238,6 +240,10 @@ components:
                 example: PLTF
               legalEntity:
                 type: string
+              claim:
+                type: string
+                example: Breach of Contract
+                sali:IRI: http://lmss.sali.org/RC2fjcpsEbrVvVymvt4oASx
     Document:
       type: object
       properties:
