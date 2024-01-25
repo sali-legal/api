@@ -24,12 +24,18 @@ tags:
     description: Contains information about legal documents
 
 paths:
-  /supported/fields:
+  /supported/tags:
     get:
       tags:
         - supported
       summary: Show all the SALI LMSS fields/tags supported by the implementer of the API
-      description: Show all the SALI LMSS fields/tags supported by the implementer of the API
+      description: |
+        Show all the SALI LMSS fields/tags supported by the implementer of the API. Includes a list of custom fields.<br>
+        - Implementers of the SALI API standard support the LMSS hierarchy/ontology, including parent-child relationships (ancestors and descendants).
+        - When SALI API User performs an API Call, finding information, the API Response results will include all of a tag’s descendents (e.g., children, grandchildren).
+        - API Responses will show the hierarchy’s last child node (the lowest descendant “leaf”). For example, for a matter involving <i>"Area of Law" > "Corporate Law" > "Business Organizations Law"</i>, the API Response results will show the lowest descendant leaf: <i>"Business Organizations Law"</i> <http://lmss.sali.org/R8AC0Iq3zua7VGgBd0jCBtz>.
+        - API Responses will not (currently) show a Parent-Child Relationships. Instead, the API Caller would do the necessary LMSS relationship mapping on the API Caller’s Production side (not the API side).
+        - This endpoint contains all fields/tags supported by the API Implementer, irrespective of parent-child relationship. Example: <i>"rdfs:label":Area of Law", "rdfs:label":"Corporate Law", "rdfs:label":"Business Organizations Law"</i>.""
       responses:
         "200":
           description: Successful operation
@@ -42,7 +48,7 @@ paths:
                     type: integer
                     format: int64
                     example: 1.0.0
-                  fields:
+                  saliTags:
                     type: array
                     items:
                       type: object
@@ -53,11 +59,34 @@ paths:
                         rdfs:label:
                           type: string
                           format: string
+                        supportedOperation:
+                          type: string
+                          format: string
                       example:
                         - sali:IRI: http://lmss.sali.org/R3391bdB1A2adE51071C7cf7
                           rdfs:label: "New York State Courts"
+                          supportedOperation: "/matter/find:request, /matter/find:response, /document/find:request, /document/find:response"
                         - sali:IRI: http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr
                           rdfs:label: "Area of Law"
+                          supportedOperation: "/matter/find:request, /matter/find:response"
+                  customTags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        custom:label:
+                          type: string
+                          format: string
+                        type:
+                          type: string
+                          format: string
+                        supportedOperation:
+                          type: string
+                          format: string
+                      example:
+                        - custom:label: "vLex-system-location"
+                          type: "string"
+                          supportedOperation: "/matter/find:request, /matter/find:response"
         "404":
           description: Not found
 
@@ -65,38 +94,14 @@ paths:
     post:
       tags:
         - matter
-      summary: Find a list of matters based on standard LMSS fields
-      description: Find a list of matters based on standard LMSS fields
+      summary: Find a list of matters based on standard LMSS fields/tags
+      description: Find a list of matters based on standard LMSS fields/tags, including supported custom fields. The request query follows Resource Query Language (RQL) structure.
       requestBody:
         description: The query to find matters information from LMSS tags
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  sali:IRI:
-                    type: string
-                  rdfs:label:
-                    type: string
-                  filter:
-                    type: string
-                  operation:
-                    type: string
-                example:
-                  - sali:IRI: "http://lmss.sali.org/R3391bdB1A2adE51071C7cf7"
-                    rdfs:label: "New York State Courts"
-                    filter:
-                    operation:
-                  - sali:IRI: "http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr"
-                    rdfs:label: "Area of Law"
-                    filter: "Tax"
-                    operation: "contains"
-                  - sali:IRI: "http://lmss.sali.org/R76LI21wQ90B6IH1x5jfFy0"
-                    rdfs:label: "Litigation Docket Number"
-                    filter: "4:22-cv-06823"
-                    operation: "contains"
+              $ref: '#/components/schemas/Query'
       responses:
         "200":
           description: successful operation
@@ -118,35 +123,15 @@ paths:
     post:
       tags:
         - document
-      summary: Find a list of documents based on standard LMSS fields
-      description: Find a list of documents based on standard LMSS fields
+      summary: Find a list of documents based on standard LMSS fields/tags
+      description: Find a list of documents based on standard LMSS fields/tags including supported custom fields. The request query follows Resource Query Language (RQL) structure.
       operationId: findDocs
       requestBody:
         description: The query to find documents information from LMSS tags
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  sali:IRI:
-                    type: string
-                  rdfs:label:
-                    type: string
-                  filter:
-                    type: string
-                  operation:
-                    type: string
-                example:
-                  - sali:IRI: "http://lmss.sali.org/R3391bdB1A2adE51071C7cf7"
-                    rdfs:label: "New York State Courts"
-                    filter:
-                    operation:
-                  - sali:IRI: "http://lmss.sali.org/RSYBzf149Mi5KE0YtmpUmr"
-                    rdfs:label: "Area of Law"
-                    filter: "Tax"
-                    operation: "contains"
+              $ref: '#/components/schemas/Query'
       responses:
         "200":
           description: successful operation
@@ -166,6 +151,61 @@ paths:
           description: Invalid input
 components:
   schemas:
+    Query:
+      type: object
+      properties:
+        operatorName: 
+          type: string
+          example: "sali:and"
+        args: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              operatorName: 
+                type: string
+              args:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sali:IRI:
+                      type: string
+                    rdfs:label:
+                      type: string
+                    custom:label:
+                      type: string
+                    filter:
+                      type: string
+                    operatorName:
+                      type: string
+              sali:IRI:
+                type: string
+              rdfs:label:
+                type: string
+              custom:label:
+                type: string
+              filter:
+                type: string
+          example:
+            - operatorName: "sali:or"
+              args:
+                - operatorName: "sali:contains"
+                  sali:IRI: "http://lmss.sali.org/R9pmjLDKAMzm147xIPPq5ul"
+                  rdfs:label: "Energy Law"
+                - operatorName: "sali:contains"
+                  sali:IRI: "http://lmss.sali.org/RYdDlq7cXsPj2kB0yDsDGF"
+                  rdfs:label: "Agriculture Law"
+                - operatorName: "sali:contains"
+                  sali:IRI: "http://lmss.sali.org/R76LI21wQ90B6IH1x5jfFy0"
+                  rdfs:label: "Litigation Docket Number"
+                  filter: "4:22-cv-06823"
+            - operatorName: "sali:contains"
+              sali:IRI: "http://lmss.sali.org/R3391bdB1A2adE51071C7cf7"
+              rdfs:label: "New York State Courts"
+            - operatorName: "sali:contains"
+              custom:label: "vLex-system-location"
+              filter: "Minneapolis-St. Paul"
     Matter:
       type: object
       properties:
