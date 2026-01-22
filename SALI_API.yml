@@ -4,7 +4,7 @@ info:
   description: |-
     SALI is a not-for-profit organization comprised of legal industry professionals from legal operations, law firms and solution providers with the goal of developing open, practical industry standards for efficient and innovative legal services. _You can find more information at: [https://www.sali.org](https://www.sali.org)._
 
-    This document contains a set of API Standrads compliant with SALI and the [Legal Matter Specification Standard](https://www.sali.org/Using-the-LMSS).
+    This document contains a set of API Standards compliant with SALI and the [Legal Matter Specification Standard](https://www.sali.org/Using-the-LMSS).
 
   license:
     name: SALI Open Standard Policy
@@ -273,4 +273,5 @@ components:
                 rdfs:label: "Currency"
                 value: "USD"
               - sali:IRI: http://lmss.sali.org/RDfdmGR6iPi4k2t6ecIUBkP
+
                 rdfs:label: "Retail Trade Industry"
